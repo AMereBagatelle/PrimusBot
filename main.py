@@ -1,5 +1,6 @@
 import discord
 
+constantsFile = 'constants.txt'
 
 class MyClient(discord.Client):
     async def on_ready(self):
@@ -11,10 +12,8 @@ class MyClient(discord.Client):
             return
 
         if message.content.startswith('.set-channel'):
-            await message.channel.send('Setting...')
-
-
-        
+            await message.channel.send('Will output to this file from this point onward.')
+            writeToLineOfFile(constantsFile, 0, '{0.channel}'.format(message))
             
 def writeToLineOfFile(filename, line, content):
     fp = open(filename, 'r')
@@ -35,4 +34,4 @@ def readLineOfFile(filename, line):
         return fp.readlines()[line]
 
 client = MyClient()
-client.run('NjU3NzEyMzY4Mjk3NDQzMzU4.Xf1mWg.35qKCUiW8Gu1lV7AdILwUsOXIyY')
+client.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')
