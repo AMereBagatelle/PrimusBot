@@ -11,16 +11,7 @@ class MyClient(discord.Client):
             return
 
         if message.content.startswith('.set-channel'):
-            writeToLineOfFile('constants.txt', 0, '{0.channel}\n'.format(message))
-            await message.channel.send('This channel is now the default for posting videos.')
-
-        if message.content.startswith('.startposting'):
-            writeToLineOfFile('constants.txt', 1, 'True')
-            await message.channel.send('I will now begin to post videos.')
-
-        if message.content.startswith('.stopposting'):
-            writeToLineOfFile('constants.txt', 1, 'False')
-            await message.channel.send('Stopping the video sending')
+            await message.channel.send('Setting...')
 
 
         
