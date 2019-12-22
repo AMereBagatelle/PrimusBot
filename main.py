@@ -1,4 +1,5 @@
 import discord
+import fileManager
 
 constantsFile = 'constants.txt'
 
@@ -11,27 +12,12 @@ class MyClient(discord.Client):
         if message.author == client.user:
             return
 
+        if message.author == discord.commands.bot:
+            return
+
         if message.content.startswith('.set-channel'):
-            await message.channel.send('Will output to this file from this point onward.')
-            writeToLineOfFile(constantsFile, 0, '{0.channel}'.format(message))
-            
-def writeToLineOfFile(filename, line, content):
-    fp = open(filename, 'r')
-    lines = fp.readlines()
-    fp.close()
-    if len(lines) == 0:
-        lines = content
-        with open(filename, 'w') as fp:
-            fp.writelines(lines)
-    else:
-        lines[line] = content
-        fp = open(filename, 'w')
-        fp.writelines(lines)
-        fp.close()
-        
-def readLineOfFile(filename, line):
-    with open(filename) as fp:
-        return fp.readlines()[line]
+            await message.channel.send('Will output moderator messages to this file from this point onward.')
+            fileManager.writeToLineOfFile(constantsFile, 0, '{0.channel}'.format(message))
 
 client = MyClient()
 client.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')
