@@ -12,12 +12,17 @@ class MyClient(discord.Client):
         if message.author == client.user:
             return
 
-        if message.author == discord.commands.bot:
-            return
+        if message.content.startswith('.'):
 
-        if message.content.startswith('.set-channel'):
-            await message.channel.send('Will output moderator messages to this file from this point onward.')
-            fileManager.writeToLineOfFile(constantsFile, 0, '{0.channel}'.format(message))
+            if message.content.startswith('.set-channel'):
+                await message.channel.send('Will output moderator messages to this file from this point onward.')
+                fileManager.writeToLineOfFile(constantsFile, 0, '{0.channel}'.format(message))
+
+        if message.content.startswith('dig good'):
+            await message.channel.send('dig good but dupe faster')
+
+        if message.content.startswith('doop bad'):
+            await message.channel.send('no')
 
 client = MyClient()
 client.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')

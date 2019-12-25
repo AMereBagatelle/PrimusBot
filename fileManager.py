@@ -22,3 +22,11 @@ def writeToLineOfFile(filename, line, content):
 def readLineOfFile(filename, line):
     with open(filename) as fp:
         return fp.readlines()[line]
+
+def writeStr(filename, toWrite):
+    with open(filename, 'w') as fp:
+        fp.write(toWrite)
+
+def readStr(filename, toWrite):
+    with open(filename) as fp:
+        return fp.read()
