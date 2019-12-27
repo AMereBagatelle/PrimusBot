@@ -1,1 +1,2 @@
-general
+ModChannel: general
+PollChannel: general2
