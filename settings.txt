@@ -1,0 +1,2 @@
+ModChannel: general
+PollChannel: polltest
