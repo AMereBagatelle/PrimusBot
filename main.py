@@ -41,7 +41,7 @@ async def resolvePoll(ctx, arg):
     #gets poll message from arg
     pollToResolve = await ctx.channel.history().get(content='**' + arg + '**')
     #gets our messages to send from pollManager
-    sendChannel, pollTitle, pollEmbed, pollResult = pollManager.resolvePoll(ctx, pollToResolve)
+    sendChannel, pollTitle, pollEmbed, pollResult = pollManager.getPollResult(ctx, pollToResolve)
     #sends poll results out in selected channel
     await sendChannel.send(pollTitle, embed=pollEmbed)
     await sendChannel.send(pollResult)

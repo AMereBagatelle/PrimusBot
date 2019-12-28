@@ -24,7 +24,7 @@ def newPoll(pollTitle, pollOptions):
     # The finished embed object
     return discord.Embed(title='', type='rich', description=pollResult)
 
-def resolvePoll(ctx, pollToResolve):
+def getPollResult(ctx, pollToResolve):
     #getting poll contents for later
     pollTitle = pollToResolve.content
     pollEmbed = pollToResolve.embeds[0]
