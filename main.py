@@ -66,4 +66,19 @@ async def resolvePoll(ctx, arg):
     await sendChannel.send(pollTitle, embed=pollEmbed)
     await sendChannel.send(pollResult)
 
+@bot.command()
+async def setModChannel(ctx):
+    fileManager.writeToLineOfFile(settingsFile, 0, 'ModChannel: {0.channel}'.format(ctx.message))
+    await ctx.send('Mod channel set.')
+
+@bot.command()
+async def setPollOutputChannel(ctx):
+    fileManager.writeToLineOfFile(settingsFile, 1, 'PollChannel: {0.channel}'.format(ctx.message))
+    await ctx.send('Poll output channel set.')
+
+@bot.command()
+async def help(ctx):
+    #TODO: Write wiki page on this and put link in send function
+    await ctx.send('')
+
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')
