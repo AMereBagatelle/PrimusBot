@@ -26,3 +26,5 @@ DISCORD_LETTERS = [
             "\N{REGIONAL INDICATOR SYMBOL LETTER Y}",
             "\N{REGIONAL INDICATOR SYMBOL LETTER Z}"
         ]
+
+settingsFile = 'settings.txt'

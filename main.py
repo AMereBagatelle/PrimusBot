@@ -7,14 +7,22 @@ import Constants
 import fileManager
 import pollManager
 
-settingsFile = 'settings.txt'
 bot = commands.Bot(command_prefix='.')
+
+@bot.event
+async def on_message(message):
+    if message.content == 'dig good':
+        await message.channel.send('Yes, but dupe faster')
+    if message.content == 'dupe bad':
+        await message.channel.send('no')
+
+    await bot.process_commands(message)
 
 #starts poll
 @bot.command()
 async def poll(ctx, arg, *arg2):
     #sends poll message
-    pollMessage = await ctx.send(arg, embed=pollManager.newPoll(arg, arg2))
+    pollMessage = await ctx.send('**' + arg + '**', embed=pollManager.newPoll(arg, arg2))
     #deletes command message
     await ctx.message.delete(delay=None)
     #tests if PollMessage failed, and if so deletes the poll message itself
@@ -27,57 +35,35 @@ async def poll(ctx, arg, *arg2):
             await pollMessage.add_reaction(Constants.DISCORD_LETTERS[i])
             i += 1
     
+#resolves poll result and posts output in separate channel
 @bot.command()
 async def resolvePoll(ctx, arg):
     #gets poll message from arg
-    pollToResolve = await ctx.channel.history().get(content=arg)
-    print(pollToResolve)
-    #getting poll contents for later
-    pollTitle = pollToResolve.content
-    pollEmbed = pollToResolve.embeds[0]
-    pollReactions = pollToResolve.reactions
-    print(pollReactions)
-    #deletes poll and command message
-    await pollToResolve.delete(delay=None)
-    await ctx.message.delete(delay=None)
-    #gets poll result
-    pollReactionNumbers = []
-    possibleResolution = True
-    for reaction in pollReactions:
-        pollReactionNumbers.append(reaction.count)
-    pollReactionNumberSet = set()
-    for number in pollReactionNumbers:
-        if number in pollReactionNumberSet and number == max(pollReactionNumberSet):
-            possibleResolution = False
-        else:
-            pollReactionNumberSet.add(number)  
-    if possibleResolution:
-        pollResultIndex = pollReactionNumbers.index(max(pollReactionNumbers))
-        pollResult = str(pollReactions[pollResultIndex].emoji)
-    else:
-        pollResult = 'No decision, it was a tie.'
-    #finds which channel to send results to
-    sendChannel = fileManager.readLineOfFile(settingsFile, 1)[13:]
-    server = ctx.message.channel.guild
-    for channel in server.channels:
-        if channel.name == sendChannel:
-            sendChannel = channel
+    pollToResolve = await ctx.channel.history().get(content='**' + arg + '**')
+    #gets our messages to send from pollManager
+    sendChannel, pollTitle, pollEmbed, pollResult = pollManager.resolvePoll(ctx, pollToResolve)
     #sends poll results out in selected channel
     await sendChannel.send(pollTitle, embed=pollEmbed)
     await sendChannel.send(pollResult)
+    
+    #deletes poll and command message
+    await pollToResolve.delete(delay=None)
+    await ctx.message.delete(delay=None)
 
+#sets channel for mod messages
 @bot.command()
 async def setModChannel(ctx):
-    fileManager.writeToLineOfFile(settingsFile, 0, 'ModChannel: {0.channel}'.format(ctx.message))
+    fileManager.writeToLineOfFile(Constants.settingsFile, 0, 'ModChannel: {0.channel}'.format(ctx.message))
     await ctx.send('Mod channel set.')
 
+#sets channel for poll outputs
 @bot.command()
 async def setPollOutputChannel(ctx):
-    fileManager.writeToLineOfFile(settingsFile, 1, 'PollChannel: {0.channel}'.format(ctx.message))
+    fileManager.writeToLineOfFile(Constants.settingsFile, 1, 'PollChannel: {0.channel}'.format(ctx.message))
     await ctx.send('Poll output channel set.')
 
 @bot.command()
-async def help(ctx):
+async def commands(ctx):
     #TODO: Write wiki page on this and put link in send function
     await ctx.send('')
 
