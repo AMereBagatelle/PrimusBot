@@ -1,36 +1,30 @@
 import discord
+from discord.ext import commands
+
 import fileManager
+import pollManager
+import Constants
 
-constantsFile = 'constants.txt'
-prefix = '.'
+settingsFile = 'settings.txt'
+bot = commands.Bot(command_prefix='.')
 
-class MyClient(discord.Client):
-    async def on_ready(self):
-        print('Logged on as {0}!'.format(self.user))
+#starts poll
+@bot.command()
+async def poll(ctx, arg, *arg2):
+    await ctx.send(arg)
+    pollMessage = await ctx.send(embed=pollManager.newPoll(arg, arg2))
 
-    async def on_message(self, message):
-        print('Message from {0.author}: {0.content}'.format(message))
-        if message.author == client.user:
-            return
+    i = 0
 
-        if startsWith(message, prefix):
+    for choice in arg2:
+        await pollMessage.add_reaction(Constants.DISCORD_LETTERS[i])
+        i += 1
+    
+@bot.command()
+async def resolvePoll(ctx, arg):
+    pollToResolve = await ctx.channel.history().get(content=arg)
+    print(pollToResolve)
+    
 
-            if startsWith(message, prefix + 'setchannel'):
-                await message.channel.send('Will output moderator messages to this channel from this point onward.')
-                fileManager.writeToLineOfFile(constantsFile, 0, 'ModChannel: {0.channel}'.format(message))
 
-            if startsWith(message, prefix + 'polloutputchannel'):
-                await message.channel.send('Will output poll outcomes to this channel from this point onward.')
-                fileManager.writeToLineOfFile(constantsFile, 1, 'PollChannel: {0.channel}'.format(message))
-
-        if startsWith(message, 'dig good'):
-            await message.channel.send('dig good but dupe faster')
-
-        if startsWith(message, 'doop bad'):
-            await message.channel.send('no')
-
-def startsWith(message, query):
-    return message.content.startswith(query)
-
-client = MyClient()
-client.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')
+bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')
