@@ -11,9 +11,9 @@ bot = commands.Bot(command_prefix=':')
 
 @bot.event
 async def on_message(message):
-    if message.content == 'dig good':
-        await message.channel.send('Yes, but dupe faster')
-    if message.content == 'dupe bad':
+    if 'dig good' in message.content or 'Dig good' in message.content:
+        await message.channel.send('Yes, but dupe easier')
+    if 'doop bad' in message.content or 'Doop bad' in message.content or 'Dupe bad' in message.content or 'dupe bad' in message.content:
         await message.channel.send('no')
 
     await bot.process_commands(message)
