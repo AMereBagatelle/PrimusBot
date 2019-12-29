@@ -7,7 +7,7 @@ import Constants
 import fileManager
 import pollManager
 
-bot = commands.Bot(command_prefix='.')
+bot = commands.Bot(command_prefix=':')
 
 @bot.event
 async def on_message(message):
@@ -50,16 +50,25 @@ async def resolvePoll(ctx, arg):
     await pollToResolve.delete(delay=None)
     await ctx.message.delete(delay=None)
 
+@bot.command()
+async def clear(ctx, arg):
+    await ctx.message.delete()
+    toDelete = ctx.channel.history(limit=int(arg))
+    async for m in toDelete:
+        await m.delete(delay=None)
+    confirmDelete = await ctx.send('Deleted {0} message(s).'.format(arg))
+    await confirmDelete.delete(delay=3)
+
 #sets channel for mod messages
 @bot.command()
 async def setModChannel(ctx):
-    fileManager.writeToLineOfFile(Constants.settingsFile, 0, 'ModChannel: {0.channel}'.format(ctx.message))
+    fileManager.writeToLineOfFile(Constants.settingsFile, 0, 'ModChannel: {0.channel.id}'.format(ctx.message))
     await ctx.send('Mod channel set.')
 
 #sets channel for poll outputs
 @bot.command()
 async def setPollOutputChannel(ctx):
-    fileManager.writeToLineOfFile(Constants.settingsFile, 1, 'PollChannel: {0.channel}'.format(ctx.message))
+    fileManager.writeToLineOfFile(Constants.settingsFile, 1, 'PollChannel: {0.channel.id}'.format(ctx.message))
     await ctx.send('Poll output channel set.')
 
 @bot.command()

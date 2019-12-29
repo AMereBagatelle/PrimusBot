@@ -1,2 +1,2 @@
-ModChannel: general
-PollChannel: polltest
+ModChannel: 660611132813475870
+PollChannel: 660166535377059859
