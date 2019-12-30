@@ -28,3 +28,6 @@ DISCORD_LETTERS = [
         ]
 
 settingsFile = 'settings.txt'
+
+digGoodList = ['dig good', 'Dig good', ':dig: good']
+dupeBadList = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']

@@ -1,5 +1,3 @@
-from symbol import namedexpr_test
-
 import discord
 from discord.ext import commands
 
@@ -11,10 +9,15 @@ bot = commands.Bot(command_prefix=':')
 
 @bot.event
 async def on_message(message):
-    if 'dig good' in message.content or 'Dig good' in message.content:
-        await message.channel.send('Yes, but dupe easier')
-    if 'doop bad' in message.content or 'Doop bad' in message.content or 'Dupe bad' in message.content or 'dupe bad' in message.content:
-        await message.channel.send('no')
+    for item in Constants.digGoodList:
+        if item in message.content:
+            digMessage = await message.channel.send('Yes, but doop easier')
+            await digMessage.delete(Delay=100)
+    
+    for item in Constants.dupeBadList:
+        if item in message.content:
+            dupeMessage = await message.channel.send('no')
+            await dupeMessage.delete(Delay=100)
 
     await bot.process_commands(message)
 
@@ -74,6 +77,6 @@ async def setPollOutputChannel(ctx):
 @bot.command()
 async def commands(ctx):
     #TODO: Write wiki page on this and put link in send function
-    await ctx.send('')
+    await ctx.send('Commands:\n')
 
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')
