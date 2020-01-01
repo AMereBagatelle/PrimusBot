@@ -5,7 +5,7 @@ import Constants
 import fileManager
 import pollManager
 
-bot = commands.Bot(command_prefix=':')
+bot = commands.Bot(command_prefix='/')
 
 @bot.event
 async def on_message(message):
@@ -23,6 +23,7 @@ async def on_message(message):
 
 #starts poll
 @bot.command()
+@commands.has_role('Member')
 async def poll(ctx, arg, *arg2):
     #sends poll message
     pollMessage = await ctx.send('**' + arg + '**', embed=pollManager.newPoll(arg2))
@@ -40,6 +41,7 @@ async def poll(ctx, arg, *arg2):
     
 #resolves poll result and posts output in separate channel
 @bot.command()
+@commands.has_role('Member')
 async def resolvePoll(ctx, arg):
     #gets poll message from arg
     pollToResolve = await ctx.channel.history().get(content='**' + arg + '**')
@@ -54,6 +56,7 @@ async def resolvePoll(ctx, arg):
     await ctx.message.delete(delay=None)
 
 @bot.command()
+@commands.has_role('Member')
 async def clear(ctx, arg):
     await ctx.message.delete()
     toDelete = ctx.channel.history(limit=int(arg))
@@ -64,22 +67,25 @@ async def clear(ctx, arg):
 
 #sets channel for mod messages
 @bot.command()
+@commands.has_role('Admin')
 async def setModChannel(ctx):
     fileManager.writeToLineOfFile(Constants.settingsFile, 0, 'ModChannel: {0.channel.id}'.format(ctx.message))
     await ctx.send('Mod channel set.')
 
 #sets channel for poll outputs
 @bot.command()
+@commands.has_role('Admin')
 async def setPollOutputChannel(ctx):
     fileManager.writeToLineOfFile(Constants.settingsFile, 1, 'PollChannel: {0.channel.id}'.format(ctx.message))
     await ctx.send('Poll output channel set.')
 
 @bot.command()
-async def commands(ctx):
+async def list_commands(ctx):
     #TODO: Write wiki page on this and put link in send function
     await ctx.send('Commands:\n')
 
 @bot.command()
+@commands.has_role('Owner')
 async def stop(ctx):
     await ctx.send('Stopping')
     await bot.logout()
