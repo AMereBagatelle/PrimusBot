@@ -25,7 +25,7 @@ async def on_message(message):
 @bot.command()
 async def poll(ctx, arg, *arg2):
     #sends poll message
-    pollMessage = await ctx.send('**' + arg + '**', embed=pollManager.newPoll(arg, arg2))
+    pollMessage = await ctx.send('**' + arg + '**', embed=pollManager.newPoll(arg2))
     #deletes command message
     await ctx.message.delete(delay=None)
     #tests if PollMessage failed, and if so deletes the poll message itself
@@ -78,5 +78,10 @@ async def setPollOutputChannel(ctx):
 async def commands(ctx):
     #TODO: Write wiki page on this and put link in send function
     await ctx.send('Commands:\n')
+
+@bot.command()
+async def stop(ctx):
+    await ctx.send('Stopping')
+    await bot.logout()
 
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')

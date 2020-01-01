@@ -3,7 +3,7 @@ import Constants
 import fileManager
 
 
-def newPoll(pollTitle, pollOptions):
+def newPoll(pollOptions):
     pollResult = ''
     pollFinal = ''
 
@@ -12,7 +12,7 @@ def newPoll(pollTitle, pollOptions):
         return discord.Embed(title='Failed', type='rich', description='Less than 26 options, please.')
 
     if len(pollOptions) < 2:
-        return discord.Embed(title='Failed', type='rich', description='Make options!')
+        return discord.Embed(title='Failed', type='rich', description='Make more options!')
 
     # Assigns pollResult to the definition of the poll, which is the emoji + the option + a newline
     i = 0
