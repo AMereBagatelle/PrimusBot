@@ -1,9 +1,12 @@
 import discord
 from discord.ext import commands
+from discord.ext import tasks
 
 import Constants
 import fileManager
 import pollManager
+import minecraftConnection
+from Constants import settingsFile
 
 bot = commands.Bot(command_prefix='/')
 
@@ -20,6 +23,11 @@ async def on_message(message):
             await dupeMessage.delete(Delay=100)
 
     await bot.process_commands(message)
+
+#starts a task to get the data for the scoreboards from server
+@tasks.loop(hours=1)
+async def getMCPlayerData(ctx):
+    minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
 
 #starts poll
 @bot.command()
@@ -78,6 +86,11 @@ async def setModChannel(ctx):
 async def setPollOutputChannel(ctx):
     fileManager.writeToLineOfFile(Constants.settingsFile, 1, 'PollChannel: {0.channel.id}'.format(ctx.message))
     await ctx.send('Poll output channel set.')
+
+@bot.command()
+@commands.has_role('Admin')
+async def setApplicationChannel(ctx):
+    fileManager.writeToLineOfFile(Constants.settingsFile, 2, 'AppChannel: {0.channel.id}'.format(ctx.message))
 
 @bot.command()
 async def list_commands(ctx):
