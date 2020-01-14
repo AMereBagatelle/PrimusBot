@@ -1,6 +1,7 @@
 import json
 import os
 import discord
+import re
 from ftplib import FTP
 
 whitelistIDs = []
@@ -26,6 +27,22 @@ def getPlayerData(outputFolder):
     ftp.quit()
 
 def getStatScoreboard(statsFolder, statToGet):
+    aliases = [
+        ['pickup.', 'stat.pickup.minecraft.'], 
+        ['drop.', 'stat.drop.minecraft.'], 
+        ['use.', 'stat.useItem.minecraft.'], 
+        ['mine.', 'stat.mineBlock.minecraft.'], 
+        ['craft.', 'stat.craftItem.minecraft.'], 
+        ['kill.', 'stat.killEntity.minecraft.']
+        ]
+    formattedStat = statToGet
+    #getting the actual stat
+    if re.search('(?:pickup|drop|use|mine|craft|kill)\.(?:minecraft\.)?\S+', statToGet):
+        for alias in aliases:
+            if alias[0] in formattedStat[0:8]:
+                formattedStat = formattedStat.replace(alias[0], alias[1])
+    #just use normal stat. approach for single worded things
+    #embed handling
     filenames = []
     unsortedResults = []
     for file in os.listdir(statsFolder):
@@ -36,20 +53,22 @@ def getStatScoreboard(statsFolder, statToGet):
         for filename in filenames:
             with open(statsFolder + '/' + filename) as currentFile:
                 currentFileLoaded = json.load(currentFile)
-                if 'stat.' + statToGet in currentFileLoaded:
+                if formattedStat in currentFileLoaded:
                     currentUUID = filename.replace('.json', '')
-                    currentScore = currentFileLoaded['stat.' + statToGet]
+                    currentScore = currentFileLoaded[formattedStat]
                     for player in whitelistFileLoaded:
                         if currentUUID in player['uuid']:
                             currentName = player['name']
                     unsortedResults.append([currentName, currentScore])
     for result in unsortedResults:
-        if len(result) != 2 | len(unsortedResults) == 0:
+        if len(result) != 2:
             #TODO: make this a message that sends back
-            return discord.Embed(title='Invalid!', type='rich', description='Not a valid stat, or no one has done this!')
+            return discord.Embed(title='Invalid!', type='rich', description='No idea why this broke... try in a few minutes')
     sortedResults = sorted(unsortedResults, key=lambda x: x[1], reverse=True)
     if len(sortedResults) > 10:
         sortedResults = sortedResults[0:10]
+    if len(sortedResults) <= 0:
+        return discord.Embed(title='Invalid!', type='rich', description='Not a stat, or nobody\'s done it')
     finalResult = ''
     for result in sortedResults:
         finalResult = finalResult + '**' + result[0] + '**: ' + str(result[1]) + '\n\n'

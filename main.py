@@ -24,14 +24,19 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
+@bot.event
+async def on_ready():
+    activity = discord.Activity(name='people, places, things', type=discord.ActivityType.watching)
+    await bot.change_presence(activity=activity)
+
 #starts a task to get the data for the scoreboards from server
 @tasks.loop(hours=1)
 async def getMCPlayerData():
     print('Getting Data')
     minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
     print('Data Sucessfully Retrieved')
-    cancel()
 
+#scoreboard-getting command
 @bot.command()
 async def s(ctx, arg):
     await ctx.send(embed=minecraftConnection.getStatScoreboard(Constants.PlayerDataOutputPath, arg))
