@@ -25,13 +25,15 @@ async def on_message(message):
     await bot.process_commands(message)
 
 #starts a task to get the data for the scoreboards from server
-@bot.command()
-async def getMCPlayerData(ctx):
+@tasks.loop(seconds=1, minutes=1, hours=1)
+async def getMCPlayerData():
+    print('Getting Data')
     minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
+    print('Data Sucessfully Retrieved')
 
 @bot.command()
-async def getStat(ctx, arg):
-    minecraftConnection.getStatScoreboard(Constants.PlayerDataOutputPath, arg)
+async def s(ctx, arg):
+    await ctx.send(embed=minecraftConnection.getStatScoreboard(Constants.PlayerDataOutputPath, arg))
 
 #starts poll
 @bot.command()
@@ -107,4 +109,5 @@ async def stop(ctx):
     await ctx.send('Stopping')
     await bot.logout()
 
+getMCPlayerData.start()
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xf6NxA.S4dKtW0GOlUEQO5gUsV5DCg5fyQ')

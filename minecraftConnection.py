@@ -1,5 +1,6 @@
 import json
 import os
+import discord
 from ftplib import FTP
 
 whitelistIDs = []
@@ -47,4 +48,9 @@ def getStatScoreboard(statsFolder, statToGet):
             #TODO: make this a message that sends back
             print('Invalid!')
     sortedResults = sorted(unsortedResults, key=lambda x: x[1], reverse=True)
-    print(sortedResults)
+    if len(sortedResults) > 10:
+        sortedResults = sortedResults[0:10]
+    finalResult = ''
+    for result in sortedResults:
+        finalResult = finalResult + '**' + result[0] + '**: ' + str(result[1]) + '\n\n'
+    return discord.Embed(title='Scoreboard for ' + statToGet, type='rich', description=finalResult)
