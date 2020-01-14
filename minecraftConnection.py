@@ -44,9 +44,9 @@ def getStatScoreboard(statsFolder, statToGet):
                             currentName = player['name']
                     unsortedResults.append([currentName, currentScore])
     for result in unsortedResults:
-        if len(result) != 2:
+        if len(result) != 2 | len(unsortedResults) == 0:
             #TODO: make this a message that sends back
-            print('Invalid!')
+            return discord.Embed(title='Invalid!', type='rich', description='Not a valid stat.')
     sortedResults = sorted(unsortedResults, key=lambda x: x[1], reverse=True)
     if len(sortedResults) > 10:
         sortedResults = sortedResults[0:10]
