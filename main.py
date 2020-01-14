@@ -30,6 +30,7 @@ async def getMCPlayerData():
     print('Getting Data')
     minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
     print('Data Sucessfully Retrieved')
+    cancel()
 
 @bot.command()
 async def s(ctx, arg):
