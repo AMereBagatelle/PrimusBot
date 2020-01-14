@@ -18,17 +18,11 @@ def getPlayerData(outputFolder):
         for point in data:
             whitelistIDs.append(point['uuid'] + '.json')
     ftp.cwd('/world/stats')
-    print('Changed Directories')
     #getting all files for playerstats
     for filename in ftp.nlst():
-        print('for loop')
         if filename in whitelistIDs:
-            print('if statement')
             with open(outputFolder + '/' + filename, 'w') as newFile:
-                print('with statement')
                 ftp.retrbinary('RETR ' + filename, lambda data: newFile.write(data.decode('UTF-8')))
-                print('retrbinary')
-    print('Gotten Stats')
     ftp.quit()
 
 def getStatScoreboard(statsFolder, statToGet):
