@@ -9,23 +9,25 @@ def getPlayerData(outputFolder):
     #logging in to ftp
     ftp = FTP(host='na99.pebblehost.com')
     ftp.login(user='brennenputh@gmail.com.78133', passwd='Candace4551')
-    ftp.getwelcome()
     #getting the whitelist
     with open('whitelist.json' , 'w') as fp:
         ftp.retrbinary('RETR whitelist.json', lambda data: fp.write(data.decode('UTF-8')))
-    print('Got whitelist')
     with open('whitelist.json', 'r') as fp:
         whitelistIDs = []
         data = json.load(fp)
         for point in data:
             whitelistIDs.append(point['uuid'] + '.json')
-    print('WhitelistIDs made')
     ftp.cwd('/world/stats')
+    print('Changed Directories')
     #getting all files for playerstats
     for filename in ftp.nlst():
+        print('for loop')
         if filename in whitelistIDs:
+            print('if statement')
             with open(outputFolder + '/' + filename, 'w') as newFile:
+                print('with statement')
                 ftp.retrbinary('RETR ' + filename, lambda data: newFile.write(data.decode('UTF-8')))
+                print('retrbinary')
     print('Gotten Stats')
     ftp.quit()
 
