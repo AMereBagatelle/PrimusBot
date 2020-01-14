@@ -46,7 +46,7 @@ def getStatScoreboard(statsFolder, statToGet):
     for result in unsortedResults:
         if len(result) != 2 | len(unsortedResults) == 0:
             #TODO: make this a message that sends back
-            return discord.Embed(title='Invalid!', type='rich', description='Not a valid stat.')
+            return discord.Embed(title='Invalid!', type='rich', description='Not a valid stat, or no one has done this!')
     sortedResults = sorted(unsortedResults, key=lambda x: x[1], reverse=True)
     if len(sortedResults) > 10:
         sortedResults = sortedResults[0:10]
