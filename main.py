@@ -25,7 +25,7 @@ async def on_message(message):
     await bot.process_commands(message)
 
 #starts a task to get the data for the scoreboards from server
-@tasks.loop(seconds=1, minutes=1, hours=1)
+@tasks.loop(hours=1)
 async def getMCPlayerData():
     print('Getting Data')
     minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
