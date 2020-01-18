@@ -36,6 +36,12 @@ async def getMCPlayerData():
     minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
     print('Data Sucessfully Retrieved')
 
+@bot.command()
+async def forceGetMCData():
+    print('Getting Data')
+    minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
+    print('Data Sucessfully Retrieved')
+
 #scoreboard-getting command
 @bot.command()
 async def s(ctx, arg, *arg2):
