@@ -38,8 +38,8 @@ async def getMCPlayerData():
 
 #scoreboard-getting command
 @bot.command()
-async def s(ctx, arg):
-    await ctx.send(embed=minecraftConnection.getStatScoreboard(Constants.PlayerDataOutputPath, arg))
+async def s(ctx, arg, *arg2):
+    await ctx.send(embed=minecraftConnection.getStatScoreboard(Constants.PlayerDataOutputPath, arg, ''.join(arg2)))
 
 #starts poll
 @bot.command()

@@ -26,7 +26,7 @@ def getPlayerData(outputFolder):
                 ftp.retrbinary('RETR ' + filename, lambda data: newFile.write(data.decode('UTF-8')))
     ftp.quit()
 
-def getStatScoreboard(statsFolder, statToGet):
+def getStatScoreboard(statsFolder, statToGet, getAll):
     aliases = [
         ['pickup.', 'stat.pickup.minecraft.'], 
         ['drop.', 'stat.drop.minecraft.'], 
@@ -65,7 +65,7 @@ def getStatScoreboard(statsFolder, statToGet):
             #TODO: make this a message that sends back
             return discord.Embed(title='Invalid!', type='rich', description='No idea why this broke... try in a few minutes')
     sortedResults = sorted(unsortedResults, key=lambda x: x[1], reverse=True)
-    if len(sortedResults) > 10:
+    if len(sortedResults) > 10 and getAll != 'all':
         sortedResults = sortedResults[0:10]
     if len(sortedResults) <= 0:
         return discord.Embed(title='Invalid!', type='rich', description='Not a stat, or nobody\'s done it')
