@@ -34,3 +34,4 @@ dupeBadList = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
 
 PlayerDataOutputPath = 'mcPlayerData'
 WhitelistFile = 'whitelist.json'
+DefenseMessage = True

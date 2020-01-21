@@ -22,6 +22,12 @@ async def on_message(message):
             dupeMessage = await message.channel.send('no')
             await dupeMessage.delete(Delay=100)
 
+    if message.content == 'whalecum' or message.content == 'Whalecum' and Constants.DefenseMessage:
+        defenseMessage = await message.channel.send('Anti-whalecum activated.')
+        await defenseMessage.delete(delay=5)
+        await message.delete(delay=4)
+        return
+    
     await bot.process_commands(message)
 
 @bot.event
