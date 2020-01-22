@@ -6,25 +6,24 @@ import Constants
 import fileManager
 import pollManager
 import minecraftConnection
-from Constants import settingsFile
 
 bot = commands.Bot(command_prefix='/')
 
 @bot.event
 async def on_message(message):
-    for item in Constants.digGoodList:
+    for item in Constants.DIG_GOOD_LIST:
         if item in message.content:
             digMessage = await message.channel.send('Yes, but doop easier')
             await digMessage.delete(Delay=100)
     
-    for item in Constants.dupeBadList:
+    for item in Constants.DUPE_BAD_LIST:
         if item in message.content:
             dupeMessage = await message.channel.send('no')
             await dupeMessage.delete(Delay=100)
 
-    if 'whalecum' in message.content or 'Whalecum' in message.content and Constants.DefenseMessage:
-        defenseMessage = await message.channel.send('Anti-whalecum activated.')
-        await defenseMessage.delete(delay=5)
+    if 'whalecum' in message.content or 'Whalecum' in message.content and Constants.DEFENSE_MESSAGE:
+        DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.')
+        await DEFENSE_MESSAGE.delete(delay=5)
         await message.delete(delay=4)
         return
 
@@ -42,21 +41,21 @@ async def on_ready():
 
 #starts a task to get the data for the scoreboards from server
 @tasks.loop(hours=1)
-async def getMCPlayerData():
+async def get_mc_playerdata():
     print('Getting Data')
-    minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
+    minecraftConnection.getPlayerData(Constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
 @bot.command()
-async def forceGetMCData():
+async def getmcdata():
     print('Getting Data')
-    minecraftConnection.getPlayerData(Constants.PlayerDataOutputPath)
+    minecraftConnection.getPlayerData(Constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
 #scoreboard-getting command
 @bot.command()
 async def s(ctx, arg, *arg2):
-    await ctx.send(embed=minecraftConnection.getStatScoreboard(Constants.PlayerDataOutputPath, arg, ''.join(arg2)))
+    await ctx.send(embed=minecraftConnection.getStatScoreboard(Constants.PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
 
 #starts poll
 @bot.command()
@@ -79,7 +78,7 @@ async def poll(ctx, arg, *arg2):
 #resolves poll result and posts output in separate channel
 @bot.command()
 @commands.has_role('Member')
-async def resolvePoll(ctx, arg):
+async def resolvepoll(ctx, arg):
     #gets poll message from arg
     pollToResolve = await ctx.channel.history().get(content='**' + arg + '**')
     #gets our messages to send from pollManager
@@ -105,21 +104,21 @@ async def clear(ctx, arg):
 #sets channel for mod messages
 @bot.command()
 @commands.has_role('Admin')
-async def setModChannel(ctx):
-    fileManager.writeToLineOfFile(Constants.settingsFile, 0, 'ModChannel: {0.channel.id}'.format(ctx.message))
+async def setmodchannel(ctx):
+    fileManager.writeToLineOfFile(Constants.SETTINGS_FILE, 0, 'ModChannel: {0.channel.id}'.format(ctx.message))
     await ctx.send('Mod channel set.')
 
 #sets channel for poll outputs
 @bot.command()
 @commands.has_role('Admin')
-async def setPollOutputChannel(ctx):
-    fileManager.writeToLineOfFile(Constants.settingsFile, 1, 'PollChannel: {0.channel.id}'.format(ctx.message))
+async def setpolloutputchannel(ctx):
+    fileManager.writeToLineOfFile(Constants.SETTINGS_FILE, 1, 'PollChannel: {0.channel.id}'.format(ctx.message))
     await ctx.send('Poll output channel set.')
 
 @bot.command()
 @commands.has_role('Admin')
-async def setApplicationChannel(ctx):
-    fileManager.writeToLineOfFile(Constants.settingsFile, 2, 'AppChannel: {0.channel.id}'.format(ctx.message))
+async def setapplicationchannel(ctx):
+    fileManager.writeToLineOfFile(Constants.SETTINGS_FILE, 2, 'AppChannel: {0.channel.id}'.format(ctx.message))
 
 @bot.command()
 async def list_commands(ctx):
@@ -132,5 +131,10 @@ async def stop(ctx):
     await ctx.send('Stopping')
     await bot.logout()
 
-getMCPlayerData.start()
+@bot.command()
+async def togglewhaledefense(ctx):
+    Constants.DEFENSE_MESSAGE = not Constants.DEFENSE_MESSAGE
+    ctx.send('Toggled')
+
+get_mc_playerdata.start()
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xh3EpA.TlpE6BelKCZekqmeoFDlA_vWHqU')

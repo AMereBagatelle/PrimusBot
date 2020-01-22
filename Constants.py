@@ -27,11 +27,11 @@ DISCORD_LETTERS = [
             "\N{REGIONAL INDICATOR SYMBOL LETTER Z}"
         ]
 
-settingsFile = 'settings.txt'
+SETTINGS_FILE = 'settings.txt'
 
-digGoodList = ['dig good', 'Dig good', ':dig: good']
-dupeBadList = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
+DIG_GOOD_LIST = ['dig good', 'Dig good', ':dig: good']
+DUPE_BAD_LIST = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
 
-PlayerDataOutputPath = 'mcPlayerData'
-WhitelistFile = 'whitelist.json'
-DefenseMessage = True
+PLAYER_DATA_FOLDER = 'mcPlayerData'
+WHITELIST_FILE = 'whitelist.json'
+DEFENSE_MESSAGE = True

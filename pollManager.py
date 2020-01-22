@@ -46,7 +46,7 @@ def getPollResult(ctx, pollToResolve):
     else:
         pollResult = 'No decision, it was a tie.'
     #finds which channel to send results to
-    sendChannel = int(fileManager.readLineOfFile(Constants.settingsFile, 1)[13:-1])
+    sendChannel = int(fileManager.readLineOfFile(Constants.SETTINGS_FILE, 1)[13:-1])
     server = ctx.message.channel.guild
     for channel in server.channels:
         if channel.id == sendChannel:

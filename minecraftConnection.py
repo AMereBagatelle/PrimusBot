@@ -48,15 +48,15 @@ def getStatScoreboard(statsFolder, statToGet, getAll):
     for file in os.listdir(statsFolder):
         if file.endswith('.json'):
             filenames.append(file)
-    with open('whitelist.json') as whitelistFile:
-        whitelistFileLoaded = json.load(whitelistFile)
+    with open('whitelist.json') as WHITELIST_FILE:
+        WHITELIST_FILELoaded = json.load(WHITELIST_FILE)
         for filename in filenames:
             with open(statsFolder + '/' + filename) as currentFile:
                 currentFileLoaded = json.load(currentFile)
                 if formattedStat in currentFileLoaded:
                     currentUUID = filename.replace('.json', '')
                     currentScore = currentFileLoaded[formattedStat]
-                    for player in whitelistFileLoaded:
+                    for player in WHITELIST_FILELoaded:
                         if currentUUID in player['uuid']:
                             currentName = player['name']
                     unsortedResults.append([currentName, currentScore])
