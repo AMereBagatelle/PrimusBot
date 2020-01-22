@@ -22,11 +22,16 @@ async def on_message(message):
             dupeMessage = await message.channel.send('no')
             await dupeMessage.delete(Delay=100)
 
-    if message.content == 'whalecum' or message.content == 'Whalecum' and Constants.DefenseMessage:
+    if 'whalecum' in message.content or 'Whalecum' in message.content and Constants.DefenseMessage:
         defenseMessage = await message.channel.send('Anti-whalecum activated.')
         await defenseMessage.delete(delay=5)
         await message.delete(delay=4)
         return
+
+    for user in message.mentions:
+        if user.name in ['RR']:
+            ping = await message.channel.send('You shouldn\'t have pinged RR... you are in for it now. (unless you had a valid reason ofc)')
+            await ping.delete(delay=5)
     
     await bot.process_commands(message)
 
