@@ -11,6 +11,9 @@ bot = commands.Bot(command_prefix='/')
 
 @bot.event
 async def on_message(message):
+    if message.author.name == 'PrimusBot':
+        return
+
     for item in Constants.DIG_GOOD_LIST:
         if item in message.content:
             digMessage = await message.channel.send('Yes, but doop easier')
@@ -20,12 +23,12 @@ async def on_message(message):
         if item in message.content:
             dupeMessage = await message.channel.send('no')
             await dupeMessage.delete(Delay=100)
-
-    if 'whalecum' in message.content or 'Whalecum' in message.content and Constants.DEFENSE_MESSAGE:
-        DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.')
-        await DEFENSE_MESSAGE.delete(delay=5)
-        await message.delete(delay=4)
-        return
+    
+    if Constants.DEFENSE_MESSAGE:
+        if 'whalecum' in message.content or 'Whalecum' in message.content:
+            DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.')
+            await DEFENSE_MESSAGE.delete(delay=5)
+            await message.delete(delay=4)
 
     for user in message.mentions:
         if user.name in ['RR']:
@@ -132,9 +135,10 @@ async def stop(ctx):
     await bot.logout()
 
 @bot.command()
+@commands.has_role('Admin')
 async def togglewhaledefense(ctx):
     Constants.DEFENSE_MESSAGE = not Constants.DEFENSE_MESSAGE
-    ctx.send('Toggled')
+    await ctx.send('Toggled, now is ' + str(Constants.DEFENSE_MESSAGE))
 
 get_mc_playerdata.start()
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xh3EpA.TlpE6BelKCZekqmeoFDlA_vWHqU')
