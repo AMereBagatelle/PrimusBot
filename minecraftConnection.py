@@ -33,11 +33,12 @@ def getStatScoreboard(statsFolder, statToGet, getAll):
         ['use.', 'stat.useItem.minecraft.'], 
         ['mine.', 'stat.mineBlock.minecraft.'], 
         ['craft.', 'stat.craftItem.minecraft.'], 
-        ['kill.', 'stat.killEntity.minecraft.']
+        ['kill.', 'stat.killEntity.minecraft.'],
+        ['break', 'stat.breakItem.minecraft.']
         ]
     formattedStat = statToGet
     #getting the actual stat
-    if re.search('(?:pickup|drop|use|mine|craft|kill)\.(?:minecraft\.)?\S+', statToGet):
+    if re.search('(?:pickup|drop|use|mine|craft|kill|break)\.(?:minecraft\.)?\S+', statToGet):
         for alias in aliases:
             if alias[0] in formattedStat[0:8]:
                 formattedStat = formattedStat.replace(alias[0], alias[1])
@@ -70,6 +71,8 @@ def getStatScoreboard(statsFolder, statToGet, getAll):
     if len(sortedResults) <= 0:
         return discord.Embed(title='Invalid!', type='rich', description='Not a stat, or nobody\'s done it')
     finalResult = ''
+    iterator = 0
     for result in sortedResults:
-        finalResult = finalResult + '**' + result[0] + '**: ' + str(result[1]) + '\n\n'
+        finalResult = finalResult + '**' + str(iterator) + ': ' + result[0] + '**: ' + str(result[1]) + '\n\n'
+        iterator += 1
     return discord.Embed(title='Scoreboard for ' + statToGet, type='rich', description=finalResult)
