@@ -8,8 +8,8 @@ whitelistIDs = []
 
 def getPlayerData(outputFolder):
     #logging in to ftp
-    ftp = FTP(host='na99.pebblehost.com')
-    ftp.login(user='brennenputh@gmail.com.78133', passwd='Candace4551')
+    ftp = FTP(host='na231.pebblehost.com')
+    ftp.login(user='AMereBagatelle.102297', passwd='Candace782')
     #getting the whitelist
     with open('whitelist.json' , 'w') as fp:
         ftp.retrbinary('RETR whitelist.json', lambda data: fp.write(data.decode('UTF-8')))
@@ -71,7 +71,7 @@ def getStatScoreboard(statsFolder, statToGet, getAll):
     if len(sortedResults) <= 0:
         return discord.Embed(title='Invalid!', type='rich', description='Not a stat, or nobody\'s done it')
     finalResult = ''
-    iterator = 0
+    iterator = 1
     for result in sortedResults:
         finalResult = finalResult + '**' + str(iterator) + ': ' + result[0] + '**: ' + str(result[1]) + '\n\n'
         iterator += 1

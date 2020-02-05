@@ -50,6 +50,7 @@ async def get_mc_playerdata():
     print('Data Sucessfully Retrieved')
 
 @bot.command()
+@commands.has_role('Admin')
 async def getmcdata():
     print('Getting Data')
     minecraftConnection.getPlayerData(Constants.PLAYER_DATA_FOLDER)
@@ -119,12 +120,7 @@ async def setpolloutputchannel(ctx):
     await ctx.send('Poll output channel set.')
 
 @bot.command()
-@commands.has_role('Admin')
-async def setapplicationchannel(ctx):
-    fileManager.writeToLineOfFile(Constants.SETTINGS_FILE, 2, 'AppChannel: {0.channel.id}'.format(ctx.message))
-
-@bot.command()
-async def list_commands(ctx):
+async def listcommands(ctx):
     #TODO: Write wiki page on this and put link in send function
     await ctx.send('Commands:\n')
 
