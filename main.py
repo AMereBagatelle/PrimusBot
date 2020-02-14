@@ -12,6 +12,8 @@ import mcRcon
 
 bot = commands.Bot(command_prefix='/')
 
+CHAT_LINK_CHANNEL = 677582149230002176
+
 @bot.event
 async def on_message(message):
     if message.author.name == 'PrimusBot':
@@ -38,6 +40,9 @@ async def on_message(message):
             ping = await message.channel.send('You shouldn\'t have pinged RR... you are in for it now. (unless you had a valid reason ofc)')
             await ping.delete(delay=5)
     
+    if message.channel == bot.get_channel(CHAT_LINK_CHANNEL):
+        mcRcon.sendRconCommand('/say [ChatLink] <' + message.author.name + '> ' + message.content)
+    
     await bot.process_commands(message)
 
 @bot.event
@@ -58,7 +63,7 @@ async def mcChatLoop():
     print('running')
     if mcRcon.readLatestLogLine():
         #finds which channel to send results to
-        sendChannel = bot.get_channel(677582149230002176)
+        sendChannel = bot.get_channel(CHAT_LINK_CHANNEL)
         with open('mcLogData/latest.log', 'r') as fp:
             data = fp.readlines()
             for line in data:
