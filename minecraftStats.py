@@ -32,7 +32,7 @@ def getStatScoreboard(statsFolder, statToGet, getAll):
         ['use.', 'stat.useItem.minecraft.'], 
         ['mine.', 'stat.mineBlock.minecraft.'], 
         ['craft.', 'stat.craftItem.minecraft.'], 
-        ['kill.', 'stat.killEntity.minecraft.'],
+        ['kill.', 'stat.killEntity.'],
         ['break', 'stat.breakItem.minecraft.']
         ]
     formattedStat = statToGet
