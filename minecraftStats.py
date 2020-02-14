@@ -2,14 +2,13 @@ import json
 import os
 import discord
 import re
+import Constants
 from ftplib import FTP
-
-whitelistIDs = []
 
 def getPlayerData(outputFolder):
     #logging in to ftp
-    ftp = FTP(host='na231.pebblehost.com')
-    ftp.login(user='AMereBagatelle.102297', passwd='Candace782')
+    ftp = FTP(host=Constants.FTP_HOST)
+    ftp.login(user=Constants.FTP_USER, passwd=Constants.FTP_PASS)
     #getting the whitelist
     with open('whitelist.json' , 'w') as fp:
         ftp.retrbinary('RETR whitelist.json', lambda data: fp.write(data.decode('UTF-8')))

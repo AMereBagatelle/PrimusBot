@@ -1,11 +1,14 @@
 import discord
+import os
+import re
 from discord.ext import commands
 from discord.ext import tasks
 
 import Constants
 import fileManager
 import pollManager
-import minecraftConnection
+import minecraftStats
+import mcRcon
 
 bot = commands.Bot(command_prefix='/')
 
@@ -41,25 +44,42 @@ async def on_message(message):
 async def on_ready():
     activity = discord.Activity(name='people, places, things', type=discord.ActivityType.watching)
     await bot.change_presence(activity=activity)
+    logCurrentLen = 0
 
 #starts a task to get the data for the scoreboards from server
 @tasks.loop(hours=1)
 async def get_mc_playerdata():
     print('Getting Data')
-    minecraftConnection.getPlayerData(Constants.PLAYER_DATA_FOLDER)
+    minecraftStats.getPlayerData(Constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
+
+@tasks.loop(seconds=5)
+async def mcChatLoop():
+    print('running')
+    if mcRcon.readLatestLogLine():
+        #finds which channel to send results to
+        sendChannel = bot.get_channel(677582149230002176)
+        with open('mcLogData/latest.log', 'r') as fp:
+            data = fp.readlines()
+            for line in data:
+                if re.match(r"\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: <\S+>(.+)\n", line):
+                    await sendChannel.send(line[33:])
+
+@bot.command()
+async def rconTest(ctx, arg):
+    mcRcon.sendRconCommand(arg)
 
 @bot.command()
 @commands.has_role('Admin')
 async def getmcdata():
     print('Getting Data')
-    minecraftConnection.getPlayerData(Constants.PLAYER_DATA_FOLDER)
+    minecraftStats.getPlayerData(Constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
 #scoreboard-getting command
 @bot.command()
 async def s(ctx, arg, *arg2):
-    await ctx.send(embed=minecraftConnection.getStatScoreboard(Constants.PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
+    await ctx.send(embed=minecraftStats.getStatScoreboard(Constants.PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
 
 #starts poll
 @bot.command()
@@ -136,5 +156,6 @@ async def togglewhaledefense(ctx):
     Constants.DEFENSE_MESSAGE = not Constants.DEFENSE_MESSAGE
     await ctx.send('Toggled, now is ' + str(Constants.DEFENSE_MESSAGE))
 
-get_mc_playerdata.start()
+#get_mc_playerdata.start()
+mcChatLoop.start()
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xh3EpA.TlpE6BelKCZekqmeoFDlA_vWHqU')
