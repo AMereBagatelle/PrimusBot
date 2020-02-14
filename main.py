@@ -161,6 +161,6 @@ async def togglewhaledefense(ctx):
     Constants.DEFENSE_MESSAGE = not Constants.DEFENSE_MESSAGE
     await ctx.send('Toggled, now is ' + str(Constants.DEFENSE_MESSAGE))
 
-#get_mc_playerdata.start()
+get_mc_playerdata.start()
 mcChatLoop.start()
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xh3EpA.TlpE6BelKCZekqmeoFDlA_vWHqU')
