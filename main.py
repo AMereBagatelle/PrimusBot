@@ -58,7 +58,7 @@ async def get_mc_playerdata():
     minecraftStats.getPlayerData(Constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
-@tasks.loop(seconds=5)
+@tasks.loop(seconds=10)
 async def mcChatLoop():
     print('running')
     if mcRcon.readLatestLogLine():
@@ -71,8 +71,11 @@ async def mcChatLoop():
                     await sendChannel.send(line[33:])
 
 @bot.command()
-async def rconTest(ctx, arg):
-    mcRcon.sendRconCommand(arg)
+async def online(ctx):
+    players = mcRcon.sendRconCommand('/list')
+    players = players[31:]
+    players = 'Currently online players: ' + players
+    await ctx.send(players)
 
 @bot.command()
 @commands.has_role('Admin')

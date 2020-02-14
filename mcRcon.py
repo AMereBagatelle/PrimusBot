@@ -9,7 +9,7 @@ firstTime = True
 def sendRconCommand(command):
     with MCRcon(Constants.RCON_IP, Constants.RCON_PASSWORD, port=Constants.RCON_PORT) as mcr:
         resp = mcr.command(command)
-        print(resp)
+        return resp
         
 def readLatestLogLine():
     global continuousLogLen
