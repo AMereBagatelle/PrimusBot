@@ -13,6 +13,7 @@ import mcRcon
 bot = commands.Bot(command_prefix='/')
 
 CHAT_LINK_CHANNEL = 677582149230002176
+POLL_OUTPUT_CHANNEL = 660845995080286208
 
 @bot.event
 async def on_message(message):
@@ -40,7 +41,7 @@ async def on_message(message):
             ping = await message.channel.send('You shouldn\'t have pinged RR... you are in for it now. (unless you had a valid reason ofc)')
             await ping.delete(delay=5)
     
-    if message.channel == bot.get_channel(CHAT_LINK_CHANNEL):
+    if message.channel == bot.get_channel(CHAT_LINK_CHANNEL) and not message.content.startswith('/'):
         mcRcon.sendRconCommand('/say [ChatLink] <' + message.author.name + '> ' + message.content)
     
     await bot.process_commands(message)
@@ -114,7 +115,8 @@ async def resolvepoll(ctx, arg):
     #gets poll message from arg
     pollToResolve = await ctx.channel.history().get(content='**' + arg + '**')
     #gets our messages to send from pollManager
-    sendChannel, pollTitle, pollEmbed, pollResult = pollManager.getPollResult(ctx, pollToResolve)
+    pollTitle, pollEmbed, pollResult = pollManager.getPollResult(ctx, pollToResolve)
+    sendChannel = bot.get_channel(POLL_OUTPUT_CHANNEL)
     #sends poll results out in selected channel
     await sendChannel.send(pollTitle, embed=pollEmbed)
     await sendChannel.send(pollResult)
@@ -139,13 +141,6 @@ async def clear(ctx, arg):
 async def setmodchannel(ctx):
     fileManager.writeToLineOfFile(Constants.SETTINGS_FILE, 0, 'ModChannel: {0.channel.id}'.format(ctx.message))
     await ctx.send('Mod channel set.')
-
-#sets channel for poll outputs
-@bot.command()
-@commands.has_role('Admin')
-async def setpolloutputchannel(ctx):
-    fileManager.writeToLineOfFile(Constants.SETTINGS_FILE, 1, 'PollChannel: {0.channel.id}'.format(ctx.message))
-    await ctx.send('Poll output channel set.')
 
 @bot.command()
 async def listcommands(ctx):
