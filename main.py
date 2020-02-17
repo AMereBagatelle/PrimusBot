@@ -74,9 +74,18 @@ async def mcChatLoop():
 @bot.command()
 async def online(ctx):
     players = mcRcon.sendRconCommand('/list')
-    players = players[31:]
-    players = 'Currently online players: ' + players
+    players = 'Currently online players: ' + players[31:]
     await ctx.send(players)
+
+@bot.command()
+@commands.has_role('Owner')
+async def sendcommand(ctx, arg):
+    commandOutput = mcRcon.sendRconCommand(arg)
+    if commandOutput != "":
+        await ctx.send('Server: ' + commandOutput)
+    else:
+        fail_message = await ctx.send("Command returns nothing.")
+        await fail_message.delete(delay=5)
 
 @bot.command()
 @commands.has_role('Admin')
@@ -159,6 +168,6 @@ async def togglewhaledefense(ctx):
     Constants.DEFENSE_MESSAGE = not Constants.DEFENSE_MESSAGE
     await ctx.send('Toggled, now is ' + str(Constants.DEFENSE_MESSAGE))
 
-get_mc_playerdata.start()
+#get_mc_playerdata.start()
 mcChatLoop.start()
 bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xh3EpA.TlpE6BelKCZekqmeoFDlA_vWHqU')
