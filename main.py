@@ -22,24 +22,20 @@ async def on_message(message):
 
     for item in Constants.DIG_GOOD_LIST:
         if item in message.content:
-            digMessage = await message.channel.send('Yes, but doop easier')
-            await digMessage.delete(Delay=100)
+            digMessage = await message.channel.send('Yes, but doop easier', delete_after=100)
     
     for item in Constants.DUPE_BAD_LIST:
         if item in message.content:
-            dupeMessage = await message.channel.send('no')
-            await dupeMessage.delete(Delay=100)
+            dupeMessage = await message.channel.send('no', delete_after=100)
     
     if Constants.DEFENSE_MESSAGE:
         if 'whalecum' in message.content or 'Whalecum' in message.content:
-            DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.')
-            await DEFENSE_MESSAGE.delete(delay=5)
+            DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.', delete_after=5)
             await message.delete(delay=4)
 
     for user in message.mentions:
         if user.name == 'RR':
-            ping = await message.channel.send('You shouldn\'t have pinged RR... you are in for it now. (unless you had a valid reason ofc)')
-            await ping.delete(delay=5)
+            ping = await message.channel.send('You shouldn\'t have pinged RR... you are in for it now. (unless you had a valid reason ofc)', delete_message=5)
     
     if message.channel == bot.get_channel(CHAT_LINK_CHANNEL) and not message.content.startswith('/'):
         mcRcon.sendRconCommand('/say [ChatLink] <' + message.author.name + '> ' + message.content)
@@ -73,6 +69,7 @@ async def mcChatLoop():
 
 @bot.command()
 async def online(ctx):
+    """Gets players currently online on the SMP."""
     players = mcRcon.sendRconCommand('/list')
     players = 'Currently online players: ' + players[31:]
     await ctx.send(players)
@@ -80,16 +77,17 @@ async def online(ctx):
 @bot.command()
 @commands.has_role('Owner')
 async def sendcommand(ctx, arg):
+    """Owner only.  Can send commands to the SMP."""
     commandOutput = mcRcon.sendRconCommand(arg)
     if commandOutput != "":
         await ctx.send('Server: ' + commandOutput)
     else:
-        fail_message = await ctx.send("Command returns nothing.")
-        await fail_message.delete(delay=5)
+        fail_message = await ctx.send("Command returns nothing.", delete_after=5)
 
 @bot.command()
-@commands.has_role('Admin')
+@commands.has_role('Owner')
 async def getmcdata():
+    """Owner only.  Forces getting data for the /s scoreboards."""
     print('Getting Data')
     minecraftStats.getPlayerData(Constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
@@ -97,12 +95,14 @@ async def getmcdata():
 #scoreboard-getting command
 @bot.command()
 async def s(ctx, arg, *arg2):
+    """Shows scoreboard for stats.  Add "all" for all results.  Check pins in #primus-bot-stuff for valid stat shortcuts."""
     await ctx.send(embed=minecraftStats.getStatScoreboard(Constants.PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
 
 #starts poll
 @bot.command()
 @commands.has_role('Member')
 async def poll(ctx, arg, *arg2):
+    """Member Only.  Create a poll in the current channel."""
     #sends poll message
     pollMessage = await ctx.send('**' + arg + '**', embed=pollManager.newPoll(arg2))
     #deletes command message
@@ -121,6 +121,7 @@ async def poll(ctx, arg, *arg2):
 @bot.command()
 @commands.has_role('Member')
 async def resolvepoll(ctx, arg):
+    """Member only.  Resolves a poll in the current channel, by the name of the argument."""
     #gets poll message from arg
     pollToResolve = await ctx.channel.history().get(content='**' + arg + '**')
     #gets our messages to send from pollManager
@@ -137,6 +138,7 @@ async def resolvepoll(ctx, arg):
 @bot.command()
 @commands.has_role('Member')
 async def clear(ctx, arg):
+    """Member Only. Clears argument number of messages."""
     await ctx.message.delete()
     toDelete = ctx.channel.history(limit=int(arg))
     async for m in toDelete:
@@ -144,27 +146,17 @@ async def clear(ctx, arg):
     confirmDelete = await ctx.send('Deleted {0} message(s).'.format(arg))
     await confirmDelete.delete(delay=3)
 
-#sets channel for mod messages
-@bot.command()
-@commands.has_role('Admin')
-async def setmodchannel(ctx):
-    fileManager.writeToLineOfFile(Constants.SETTINGS_FILE, 0, 'ModChannel: {0.channel.id}'.format(ctx.message))
-    await ctx.send('Mod channel set.')
-
-@bot.command()
-async def listcommands(ctx):
-    #TODO: Write wiki page on this and put link in send function
-    await ctx.send('Commands:\n')
-
 @bot.command()
 @commands.has_role('Owner')
 async def stop(ctx):
+    """Owner Only.  Stops the bot."""
     await ctx.send('Stopping')
     await bot.logout()
 
 @bot.command()
-@commands.has_role('Admin')
+@commands.has_role('Owner')
 async def togglewhaledefense(ctx):
+    """Owner Only.  Toggles whalecum defense."""
     Constants.DEFENSE_MESSAGE = not Constants.DEFENSE_MESSAGE
     await ctx.send('Toggled, now is ' + str(Constants.DEFENSE_MESSAGE))
 
