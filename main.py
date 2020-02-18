@@ -74,24 +74,6 @@ async def online(ctx):
     players = 'Currently online players: ' + players[31:]
     await ctx.send(players)
 
-@bot.command()
-@commands.has_role('Owner')
-async def sendcommand(ctx, arg):
-    """Owner only.  Can send commands to the SMP."""
-    commandOutput = mcRcon.sendRconCommand(arg)
-    if commandOutput != "":
-        await ctx.send('Server: ' + commandOutput)
-    else:
-        fail_message = await ctx.send("Command returns nothing.", delete_after=5)
-
-@bot.command()
-@commands.has_role('Owner')
-async def getmcdata():
-    """Owner only.  Forces getting data for the /s scoreboards."""
-    print('Getting Data')
-    minecraftStats.getPlayerData(Constants.PLAYER_DATA_FOLDER)
-    print('Data Sucessfully Retrieved')
-
 #scoreboard-getting command
 @bot.command()
 async def s(ctx, arg, *arg2):
@@ -159,6 +141,25 @@ async def togglewhaledefense(ctx):
     """Owner Only.  Toggles whalecum defense."""
     Constants.DEFENSE_MESSAGE = not Constants.DEFENSE_MESSAGE
     await ctx.send('Toggled, now is ' + str(Constants.DEFENSE_MESSAGE))
+
+@bot.command()
+@commands.has_role('Owner')
+async def sendcommand(ctx, arg):
+    """Owner only.  Can send commands to the SMP."""
+    commandOutput = mcRcon.sendRconCommand(arg)
+    if commandOutput != "":
+        await ctx.send('Server: ' + commandOutput)
+    else:
+        fail_message = await ctx.send("Command returns nothing.", delete_after=5)
+
+
+@bot.command()
+@commands.has_role('Owner')
+async def getmcdata():
+    """Owner only.  Forces getting data for the /s scoreboards."""
+    print('Getting Data')
+    minecraftStats.getPlayerData(Constants.PLAYER_DATA_FOLDER)
+    print('Data Sucessfully Retrieved')
 
 get_mc_playerdata.start()
 mcChatLoop.start()
