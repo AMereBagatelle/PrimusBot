@@ -80,6 +80,11 @@ async def s(ctx, arg, *arg2):
     """Shows scoreboard for stats.  Add "all" for all results.  Check pins in #primus-bot-stuff for valid stat shortcuts."""
     await ctx.send(embed=minecraftStats.getStatScoreboard(Constants.PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
 
+@bot.command()
+async def stoplazy(ctx):
+    await ctx.send(file=discord.File('stop_lazy.png'))
+    await ctx.message.delete()
+
 #starts poll
 @bot.command()
 @commands.has_role('Member')
