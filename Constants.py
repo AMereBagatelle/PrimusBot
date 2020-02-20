@@ -27,8 +27,6 @@ DISCORD_LETTERS = [
             "\N{REGIONAL INDICATOR SYMBOL LETTER Z}"
         ]
 
-SETTINGS_FILE = 'settings.txt'
-
 DIG_GOOD_LIST = ['dig good', 'Dig good', ':dig: good']
 DUPE_BAD_LIST = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
 

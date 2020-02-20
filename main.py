@@ -29,10 +29,9 @@ async def on_message(message):
         if item in message.content:
             dupeMessage = await message.channel.send('no', delete_after=100)
     
-    if Constants.DEFENSE_MESSAGE:
-        if 'whalecum' in message.content or 'Whalecum' in message.content:
-            DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.', delete_after=5)
-            await message.delete(delay=4)
+    if 'whalecum' in message.content or 'Whalecum' in message.content and Constants.DEFENSE_MESSAGE:
+        DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.', delete_after=5)
+        await message.delete(delay=4)
 
     for user in message.mentions:
         if user.name == 'RR':
