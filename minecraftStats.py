@@ -4,11 +4,12 @@ import discord
 import re
 import Constants
 from ftplib import FTP
+import credentials
 
 def getPlayerData(outputFolder):
     #logging in to ftp
-    ftp = FTP(host=Constants.FTP_HOST)
-    ftp.login(user=Constants.FTP_USER, passwd=Constants.FTP_PASS)
+    ftp = FTP(host=credentials.FTP_HOST)
+    ftp.login(user=credentials.FTP_USER, passwd=credentials.FTP_PASS)
     #getting the whitelist
     with open('whitelist.json' , 'w') as fp:
         ftp.retrbinary('RETR whitelist.json', lambda data: fp.write(data.decode('UTF-8')))

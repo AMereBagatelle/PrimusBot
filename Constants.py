@@ -35,11 +35,3 @@ DUPE_BAD_LIST = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
 PLAYER_DATA_FOLDER = 'mcPlayerData'
 WHITELIST_FILE = 'whitelist.json'
 DEFENSE_MESSAGE = True
-
-RCON_IP = "144.217.130.159"
-RCON_PORT = 8153
-RCON_PASSWORD = "hypnosworstnos"
-
-FTP_HOST = 'na231.pebblehost.com'
-FTP_USER = 'AMereBagatelle.102297'
-FTP_PASS = 'Candace782'

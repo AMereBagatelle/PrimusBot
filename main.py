@@ -9,6 +9,7 @@ import fileManager
 import pollManager
 import minecraftStats
 import mcRcon
+import credentials
 
 bot = commands.Bot(command_prefix='/')
 
@@ -46,7 +47,6 @@ async def on_message(message):
 async def on_ready():
     activity = discord.Activity(name='people, places, things', type=discord.ActivityType.watching)
     await bot.change_presence(activity=activity)
-    logCurrentLen = 0
 
 #starts a task to get the data for the scoreboards from server
 @tasks.loop(hours=1)
@@ -82,6 +82,7 @@ async def s(ctx, arg, *arg2):
 
 @bot.command()
 async def stoplazy(ctx):
+    """Tell someone to stop lazy."""
     await ctx.send(file=discord.File('stop_lazy.png'))
     await ctx.message.delete()
 
@@ -168,4 +169,4 @@ async def getmcdata():
 
 get_mc_playerdata.start()
 mcChatLoop.start()
-bot.run('NjU3OTIwNzg4MDk1MTcyNjA4.Xh3EpA.TlpE6BelKCZekqmeoFDlA_vWHqU')
+bot.run(credentials.bot_token)

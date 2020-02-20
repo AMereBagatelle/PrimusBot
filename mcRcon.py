@@ -2,14 +2,15 @@ from mcrcon import MCRcon
 from ftplib import FTP
 import Constants
 import os
+import credentials
 
 continuousLogLen = 0
 firstTime = True
 
 def sendRconCommand(command):
-    with MCRcon(Constants.RCON_IP, Constants.RCON_PASSWORD, port=Constants.RCON_PORT) as mcr:
-        resp = mcr.command(command)
-        return resp
+    with MCRcon(credentials.RCON_IP, credentials.RCON_PASSWORD, port=credentials.RCON_PORT) as mcr:
+        output = mcr.command(command)
+        return output
         
 def readLatestLogLine():
     global continuousLogLen
@@ -17,8 +18,8 @@ def readLatestLogLine():
     fileChanged = False
     checkLogLen = continuousLogLen
     currentLogLen = os.path.getsize('mcLogData/latest.log')
-    ftp = FTP(host=Constants.FTP_HOST)
-    ftp.login(user=Constants.FTP_USER, passwd=Constants.FTP_PASS)
+    ftp = FTP(host=credentials.FTP_HOST)
+    ftp.login(user=credentials.FTP_USER, passwd=credentials.FTP_PASS)
     ftp.cwd('logs')
     ftp.sendcmd('TYPE i')
     ftpFileLen = int(ftp.size('latest.log'))

@@ -3,3 +3,4 @@ __pycache__
 mcPlayerData
 whitelist.json
 mcLogData
+credentials.py
