@@ -4,8 +4,7 @@ import re
 from discord.ext import commands
 from discord.ext import tasks
 
-import Constants
-import fileManager
+import constants
 import pollManager
 import minecraftStats
 import mcRcon
