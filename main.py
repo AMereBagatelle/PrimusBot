@@ -20,15 +20,15 @@ async def on_message(message):
     if message.author.name == 'PrimusBot':
         return
 
-    for item in Constants.DIG_GOOD_LIST:
+    for item in constants.DIG_GOOD_LIST:
         if item in message.content:
             digMessage = await message.channel.send('Yes, but doop easier', delete_after=100)
     
-    for item in Constants.DUPE_BAD_LIST:
+    for item in constants.DUPE_BAD_LIST:
         if item in message.content:
             dupeMessage = await message.channel.send('no', delete_after=100)
     
-    if 'whalecum' in message.content or 'Whalecum' in message.content and Constants.DEFENSE_MESSAGE:
+    if 'whalecum' in message.content or 'Whalecum' in message.content and constants.DEFENSE_MESSAGE:
         DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.', delete_after=5)
         await message.delete(delay=4)
 
@@ -50,7 +50,7 @@ async def on_ready():
 @tasks.loop(hours=1)
 async def get_mc_playerdata():
     print('Getting Data')
-    minecraftStats.getPlayerData(Constants.PLAYER_DATA_FOLDER)
+    minecraftStats.getPlayerData(constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
 @tasks.loop(seconds=10)
@@ -76,7 +76,7 @@ async def online(ctx):
 @bot.command()
 async def s(ctx, arg, *arg2):
     """Shows scoreboard for stats.  Add "all" for all results.  Check pins in #primus-bot-stuff for valid stat shortcuts."""
-    await ctx.send(embed=minecraftStats.getStatScoreboard(Constants.PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
+    await ctx.send(embed=minecraftStats.getStatScoreboard(constants.PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
 
 @bot.command()
 async def stoplazy(ctx):
@@ -100,7 +100,7 @@ async def poll(ctx, arg, *arg2):
         #adds reactions
         i = 0
         for choice in arg2:
-            await pollMessage.add_reaction(Constants.DISCORD_LETTERS[i])
+            await pollMessage.add_reaction(constants.DISCORD_LETTERS[i])
             i += 1
     
 #resolves poll result and posts output in separate channel
@@ -143,8 +143,8 @@ async def stop(ctx):
 @commands.has_role('Owner')
 async def togglewhaledefense(ctx):
     """Owner Only.  Toggles whalecum defense."""
-    Constants.DEFENSE_MESSAGE = not Constants.DEFENSE_MESSAGE
-    await ctx.send('Toggled, now is ' + str(Constants.DEFENSE_MESSAGE))
+    constants.DEFENSE_MESSAGE = not constants.DEFENSE_MESSAGE
+    await ctx.send('Toggled, now is ' + str(constants.DEFENSE_MESSAGE))
 
 @bot.command()
 @commands.has_role('Owner')
@@ -162,9 +162,9 @@ async def sendcommand(ctx, arg):
 async def getmcdata():
     """Owner only.  Forces getting data for the /s scoreboards."""
     print('Getting Data')
-    minecraftStats.getPlayerData(Constants.PLAYER_DATA_FOLDER)
+    minecraftStats.getPlayerData(constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
 get_mc_playerdata.start()
 mcChatLoop.start()
-bot.run(credentials.bot_token)
+bot.run(credentials.BOT_TOKEN)

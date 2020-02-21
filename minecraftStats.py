@@ -2,7 +2,7 @@ import json
 import os
 import discord
 import re
-import Constants
+import constants
 from ftplib import FTP
 import credentials
 

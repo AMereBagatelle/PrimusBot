@@ -1,6 +1,6 @@
 from mcrcon import MCRcon
 from ftplib import FTP
-import Constants
+import constants
 import os
 import credentials
 
