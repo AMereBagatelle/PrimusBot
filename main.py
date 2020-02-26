@@ -15,6 +15,7 @@ bot = commands.Bot(command_prefix='/')
 CHAT_LINK_CHANNEL = 677582149230002176
 POLL_OUTPUT_CHANNEL = 660845995080286208
 
+# Things that can't be done in regular bot.command
 @bot.event
 async def on_message(message):
     if message.author.name == 'PrimusBot':
@@ -41,6 +42,7 @@ async def on_message(message):
     
     await bot.process_commands(message)
 
+# Sets status
 @bot.event
 async def on_ready():
     activity = discord.Activity(name='people, places, things', type=discord.ActivityType.watching)
@@ -53,6 +55,7 @@ async def get_mc_playerdata():
     minecraftStats.getPlayerData(constants.PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
+# runs the channel for mc chat link
 @tasks.loop(seconds=10)
 async def mcChatLoop():
     print('running')
@@ -65,8 +68,16 @@ async def mcChatLoop():
                 if re.match(r"\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: <\S+>(.+)\n", line):
                     await sendChannel.send(line[33:])
 
+# Public Commands
 @bot.command()
 async def online(ctx):
+    """Gets players currently online on the SMP."""
+    players = mcRcon.sendRconCommand('/list')
+    players = 'Currently online players: ' + players[31:]
+    await ctx.send(players)
+
+@bot.command()
+async def list(ctx):
     """Gets players currently online on the SMP."""
     players = mcRcon.sendRconCommand('/list')
     players = 'Currently online players: ' + players[31:]
@@ -84,6 +95,7 @@ async def stoplazy(ctx):
     await ctx.send(file=discord.File('stop_lazy.png'))
     await ctx.message.delete()
 
+# Member Commands
 #starts poll
 @bot.command()
 @commands.has_role('Member')
@@ -132,6 +144,7 @@ async def clear(ctx, arg):
     confirmDelete = await ctx.send('Deleted {0} message(s).'.format(arg))
     await confirmDelete.delete(delay=3)
 
+# Owner Commands
 @bot.command()
 @commands.has_role('Owner')
 async def stop(ctx):
@@ -155,7 +168,6 @@ async def sendcommand(ctx, arg):
         await ctx.send('Server: ' + commandOutput)
     else:
         fail_message = await ctx.send("Command returns nothing.", delete_after=5)
-
 
 @bot.command()
 @commands.has_role('Owner')
