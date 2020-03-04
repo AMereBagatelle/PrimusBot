@@ -58,7 +58,6 @@ async def get_mc_playerdata():
 # runs the channel for mc chat link
 @tasks.loop(seconds=10)
 async def mcChatLoop():
-    print('running')
     if mcRcon.readLatestLogLine():
         #finds which channel to send results to
         sendChannel = bot.get_channel(CHAT_LINK_CHANNEL)

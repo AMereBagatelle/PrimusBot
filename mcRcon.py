@@ -3,6 +3,7 @@ from ftplib import FTP
 import constants
 import os
 import credentials
+from datetime import datetime
 
 continuousLogLen = 0
 firstTime = True
@@ -29,14 +30,11 @@ def readLatestLogLine():
                 ftp.retrbinary('RETR latest.log', lambda data: fp.write(data.decode('UTF-8')), rest=continuousLogLen)
                 fileChanged = True
                 continuousLogLen += ftpFileLen - continuousLogLen
-                print('Getting files')
             except:
-                print('Was not able to get files')
+                print('Was not able to get files, time is: ' + datetime.now().strftime(r"%d/%m/%Y %H:%M:%S"))
     ftp.close()
     if not fileChanged or firstTime:
-        print('False')
         firstTime = False
         return False
     else:
-        print('True')
         return True

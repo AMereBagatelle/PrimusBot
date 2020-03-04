@@ -34,15 +34,15 @@ def getStatScoreboard(statsFolder, statToGet, getAll):
         ['mine.', 'stat.mineBlock.minecraft.'], 
         ['craft.', 'stat.craftItem.minecraft.'], 
         ['kill.', 'stat.killEntity.'],
-        ['break', 'stat.breakItem.minecraft.']
-        ]
+        ['break.', 'stat.breakItem.minecraft.']
+    ]
     formattedStat = statToGet
     #getting the actual stat
     if re.search('(?:pickup|drop|use|mine|craft|kill|break)\.(?:minecraft\.)?\S+', statToGet):
         for alias in aliases:
             if alias[0] in formattedStat[0:8]:
                 formattedStat = formattedStat.replace(alias[0], alias[1])
-    #just use normal stat. approach for single worded things
+    #just use normal stat.minecraft. approach for single worded things
     #embed handling
     filenames = []
     unsortedResults = []
