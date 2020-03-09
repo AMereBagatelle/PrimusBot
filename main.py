@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord.ext import tasks
 import os
 import re
+import json
 from mcrcon import MCRcon
 from ftplib import FTP
 
@@ -10,9 +11,16 @@ import credentials
 
 bot = commands.Bot(command_prefix='/')
 
+# Stuff that you might want to customize for your own bot
 CHAT_LINK_CHANNEL = 677582149230002176
 POLL_OUTPUT_CHANNEL = 660845995080286208
 
+PLAYER_DATA_FOLDER = 'mcPlayerData'
+
+DIG_GOOD_LIST = ['dig good', 'Dig good', ':dig: good']
+DUPE_BAD_LIST = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
+
+# Stuff that should stay constant
 DISCORD_LETTERS = [
             "\N{REGIONAL INDICATOR SYMBOL LETTER A}",
             "\N{REGIONAL INDICATOR SYMBOL LETTER B}",
@@ -42,16 +50,14 @@ DISCORD_LETTERS = [
             "\N{REGIONAL INDICATOR SYMBOL LETTER Z}"
         ]
 
-DIG_GOOD_LIST = ['dig good', 'Dig good', ':dig: good']
-DUPE_BAD_LIST = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
-
-PLAYER_DATA_FOLDER = 'mcPlayerData'
 WHITELIST_FILE = 'whitelist.json'
 DEFENSE_MESSAGE = True
 
 # Things that can't be done in regular bot.command
 @bot.event
 async def on_message(message):
+    global DEFENSE_MESSAGE
+
     if message.author.name == 'PrimusBot':
         return
 
@@ -72,7 +78,7 @@ async def on_message(message):
             ping = await message.channel.send('You shouldn\'t have pinged RR... you are in for it now. (unless you had a valid reason ofc)', delete_message=5)
     
     if message.channel == bot.get_channel(CHAT_LINK_CHANNEL) and not message.content.startswith('/'):
-        mcRcon.sendRconCommand('/say [ChatLink] <' + message.author.name + '> ' + message.content)
+        sendRconCommand('/say [ChatLink] <' + message.author.name + '> ' + message.content)
     
     await bot.process_commands(message)
 
@@ -86,13 +92,13 @@ async def on_ready():
 @tasks.loop(hours=1)
 async def get_mc_playerdata():
     print('Getting Data')
-    minecraftStats.getPlayerData(PLAYER_DATA_FOLDER)
+    getPlayerData(PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
 # runs the channel for mc chat link
 @tasks.loop(seconds=10)
 async def mcChatLoop():
-    if mcRcon.readLatestLogLine():
+    if readLatestLogLine():
         #finds which channel to send results to
         sendChannel = bot.get_channel(CHAT_LINK_CHANNEL)
         with open('mcLogData/latest.log', 'r') as fp:
@@ -105,14 +111,14 @@ async def mcChatLoop():
 @bot.command()
 async def online(ctx):
     """Gets players currently online on the SMP."""
-    players = mcRcon.sendRconCommand('/list')
+    players = sendRconCommand('/list')
     players = 'Currently online players: ' + players[31:]
     await ctx.send(players)
 
 @bot.command()
 async def list(ctx):
     """Gets players currently online on the SMP."""
-    players = mcRcon.sendRconCommand('/list')
+    players = sendRconCommand('/list')
     players = 'Currently online players: ' + players[31:]
     await ctx.send(players)
 
@@ -120,7 +126,7 @@ async def list(ctx):
 @bot.command()
 async def s(ctx, arg, *arg2):
     """Shows scoreboard for stats.  Add "all" for all results.  Check pins in #primus-bot-stuff for valid stat shortcuts."""
-    await ctx.send(embed=minecraftStats.getStatScoreboard(PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
+    await ctx.send(embed=getStatScoreboard(PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
 
 @bot.command()
 async def stoplazy(ctx):
@@ -135,7 +141,7 @@ async def stoplazy(ctx):
 async def poll(ctx, arg, *arg2):
     """Member Only.  Create a poll in the current channel."""
     #sends poll message
-    pollMessage = await ctx.send('**' + arg + '**', embed=pollManager.newPoll(arg2))
+    pollMessage = await ctx.send('**' + arg + '**', embed=newPoll(arg2))
     #deletes command message
     await ctx.message.delete(delay=None)
     #tests if PollMessage failed, and if so deletes the poll message itself
@@ -156,7 +162,7 @@ async def resolvepoll(ctx, arg):
     #gets poll message from arg
     pollToResolve = await ctx.channel.history().get(content='**' + arg + '**')
     #gets our messages to send from pollManager
-    pollTitle, pollEmbed, pollResult = pollManager.getPollResult(ctx, pollToResolve)
+    pollTitle, pollEmbed, pollResult = getPollResult(ctx, pollToResolve)
     sendChannel = bot.get_channel(POLL_OUTPUT_CHANNEL)
     #sends poll results out in selected channel
     await sendChannel.send(pollTitle, embed=pollEmbed)
@@ -196,7 +202,7 @@ async def togglewhaledefense(ctx):
 @commands.has_role('Owner')
 async def sendcommand(ctx, arg):
     """Owner only.  Can send commands to the SMP."""
-    commandOutput = mcRcon.sendRconCommand(arg)
+    commandOutput = sendRconCommand(arg)
     if commandOutput != "":
         await ctx.send('Server: ' + commandOutput)
     else:
@@ -207,7 +213,7 @@ async def sendcommand(ctx, arg):
 async def getmcdata():
     """Owner only.  Forces getting data for the /s scoreboards."""
     print('Getting Data')
-    minecraftStats.getPlayerData(PLAYER_DATA_FOLDER)
+    getPlayerData(PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
 # Other functions, generally just stuff for minecraft communication.
@@ -322,7 +328,7 @@ def newPoll(pollOptions):
     pollFinal = ''
 
     # These two checks are to make sure that we don't get a invalid poll request, because that would just be no fun
-    if len(pollOptions) > len(constants.DISCORD_LETTERS):
+    if len(pollOptions) > len(DISCORD_LETTERS):
         return discord.Embed(title='Failed', type='rich', description='Less than 26 options, please.')
 
     if len(pollOptions) < 2:
@@ -331,7 +337,7 @@ def newPoll(pollOptions):
     # Assigns pollResult to the definition of the poll, which is the emoji + the option + a newline
     i = 0
     for p in pollOptions:
-        p = constants.DISCORD_LETTERS[i] + ' ' + p + '\n'
+        p = DISCORD_LETTERS[i] + ' ' + p + '\n'
         pollResult = pollResult + p
         i = i + 1
 
