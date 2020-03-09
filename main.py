@@ -1,13 +1,11 @@
 import discord
-import os
-import re
 from discord.ext import commands
 from discord.ext import tasks
+import os
+import re
+from mcrcon import MCRcon
+from ftplib import FTP
 
-import constants
-import pollManager
-import minecraftStats
-import mcRcon
 import credentials
 
 bot = commands.Bot(command_prefix='/')
@@ -15,21 +13,57 @@ bot = commands.Bot(command_prefix='/')
 CHAT_LINK_CHANNEL = 677582149230002176
 POLL_OUTPUT_CHANNEL = 660845995080286208
 
+DISCORD_LETTERS = [
+            "\N{REGIONAL INDICATOR SYMBOL LETTER A}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER B}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER C}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER D}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER E}", 
+            "\N{REGIONAL INDICATOR SYMBOL LETTER F}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER G}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER H}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER I}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER J}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER K}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER L}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER M}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER N}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER O}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER P}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER Q}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER R}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER S}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER T}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER U}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER V}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER W}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER X}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER Y}",
+            "\N{REGIONAL INDICATOR SYMBOL LETTER Z}"
+        ]
+
+DIG_GOOD_LIST = ['dig good', 'Dig good', ':dig: good']
+DUPE_BAD_LIST = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
+
+PLAYER_DATA_FOLDER = 'mcPlayerData'
+WHITELIST_FILE = 'whitelist.json'
+DEFENSE_MESSAGE = True
+
 # Things that can't be done in regular bot.command
 @bot.event
 async def on_message(message):
     if message.author.name == 'PrimusBot':
         return
 
-    for item in constants.DIG_GOOD_LIST:
+    for item in DIG_GOOD_LIST:
         if item in message.content:
             digMessage = await message.channel.send('Yes, but doop easier', delete_after=100)
     
-    for item in constants.DUPE_BAD_LIST:
+    for item in DUPE_BAD_LIST:
         if item in message.content:
             dupeMessage = await message.channel.send('no', delete_after=100)
     
-    if 'whalecum' in message.content or 'Whalecum' in message.content and constants.DEFENSE_MESSAGE:
+    if 'whalecum' in message.content or 'Whalecum' in message.content and DEFENSE_MESSAGE:
         DEFENSE_MESSAGE = await message.channel.send('Anti-whalecum activated.', delete_after=5)
         await message.delete(delay=4)
 
@@ -52,7 +86,7 @@ async def on_ready():
 @tasks.loop(hours=1)
 async def get_mc_playerdata():
     print('Getting Data')
-    minecraftStats.getPlayerData(constants.PLAYER_DATA_FOLDER)
+    minecraftStats.getPlayerData(PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
 
 # runs the channel for mc chat link
@@ -86,7 +120,7 @@ async def list(ctx):
 @bot.command()
 async def s(ctx, arg, *arg2):
     """Shows scoreboard for stats.  Add "all" for all results.  Check pins in #primus-bot-stuff for valid stat shortcuts."""
-    await ctx.send(embed=minecraftStats.getStatScoreboard(constants.PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
+    await ctx.send(embed=minecraftStats.getStatScoreboard(PLAYER_DATA_FOLDER, arg, ''.join(arg2)))
 
 @bot.command()
 async def stoplazy(ctx):
@@ -111,7 +145,7 @@ async def poll(ctx, arg, *arg2):
         #adds reactions
         i = 0
         for choice in arg2:
-            await pollMessage.add_reaction(constants.DISCORD_LETTERS[i])
+            await pollMessage.add_reaction(DISCORD_LETTERS[i])
             i += 1
     
 #resolves poll result and posts output in separate channel
@@ -155,8 +189,8 @@ async def stop(ctx):
 @commands.has_role('Owner')
 async def togglewhaledefense(ctx):
     """Owner Only.  Toggles whalecum defense."""
-    constants.DEFENSE_MESSAGE = not constants.DEFENSE_MESSAGE
-    await ctx.send('Toggled, now is ' + str(constants.DEFENSE_MESSAGE))
+    DEFENSE_MESSAGE = not DEFENSE_MESSAGE
+    await ctx.send('Toggled, now is ' + str(DEFENSE_MESSAGE))
 
 @bot.command()
 @commands.has_role('Owner')
@@ -173,8 +207,160 @@ async def sendcommand(ctx, arg):
 async def getmcdata():
     """Owner only.  Forces getting data for the /s scoreboards."""
     print('Getting Data')
-    minecraftStats.getPlayerData(constants.PLAYER_DATA_FOLDER)
+    minecraftStats.getPlayerData(PLAYER_DATA_FOLDER)
     print('Data Sucessfully Retrieved')
+
+# Other functions, generally just stuff for minecraft communication.
+def sendRconCommand(command):
+    with MCRcon(credentials.RCON_IP, credentials.RCON_PASSWORD, port=credentials.RCON_PORT) as mcr:
+        output = mcr.command(command)
+        return output
+
+# THESE VARIABLES SHOULD ONLY BE CALLED IN READLATESTLOGLINE
+continuousLogLen = 0
+firstTime = True
+        
+def readLatestLogLine():
+    global continuousLogLen
+    global firstTime
+    fileChanged = False
+    checkLogLen = continuousLogLen
+    currentLogLen = os.path.getsize('mcLogData/latest.log')
+    ftp = FTP(host=credentials.FTP_HOST)
+    ftp.login(user=credentials.FTP_USER, passwd=credentials.FTP_PASS)
+    ftp.cwd('logs')
+    ftp.sendcmd('TYPE i')
+    ftpFileLen = int(ftp.size('latest.log'))
+    if (continuousLogLen < ftpFileLen):
+        with open('mcLogData/latest.log', 'w+') as fp:
+            try:
+                ftp.retrbinary('RETR latest.log', lambda data: fp.write(data.decode('UTF-8')), rest=continuousLogLen)
+                fileChanged = True
+                continuousLogLen += ftpFileLen - continuousLogLen
+            except:
+                print('Was not able to get files, time is: ' + datetime.now().strftime(r"%d/%m/%Y %H:%M:%S"))
+    ftp.close()
+    if not fileChanged or firstTime:
+        firstTime = False
+        return False
+    else:
+        return True
+
+def getPlayerData(outputFolder):
+    #logging in to ftp
+    ftp = FTP(host=credentials.FTP_HOST)
+    ftp.login(user=credentials.FTP_USER, passwd=credentials.FTP_PASS)
+    #getting the whitelist
+    with open('whitelist.json' , 'w') as fp:
+        ftp.retrbinary('RETR whitelist.json', lambda data: fp.write(data.decode('UTF-8')))
+    with open('whitelist.json', 'r') as fp:
+        whitelistIDs = []
+        data = json.load(fp)
+        for point in data:
+            whitelistIDs.append(point['uuid'] + '.json')
+    ftp.cwd('/world/stats')
+    #getting all files for playerstats
+    for filename in ftp.nlst():
+        if filename in whitelistIDs:
+            with open(outputFolder + '/' + filename, 'w') as newFile:
+                ftp.retrbinary('RETR ' + filename, lambda data: newFile.write(data.decode('UTF-8')))
+    ftp.quit()
+
+def getStatScoreboard(statsFolder, statToGet, getAll):
+    aliases = [
+        ['pickup.', 'stat.pickup.minecraft.'], 
+        ['drop.', 'stat.drop.minecraft.'], 
+        ['use.', 'stat.useItem.minecraft.'], 
+        ['mine.', 'stat.mineBlock.minecraft.'], 
+        ['craft.', 'stat.craftItem.minecraft.'], 
+        ['kill.', 'stat.killEntity.'],
+        ['break.', 'stat.breakItem.minecraft.']
+    ]
+    formattedStat = statToGet
+    #getting the actual stat
+    if re.search('(?:pickup|drop|use|mine|craft|kill|break)\.(?:minecraft\.)?\S+', statToGet):
+        for alias in aliases:
+            if alias[0] in formattedStat[0:8]:
+                formattedStat = formattedStat.replace(alias[0], alias[1])
+    #just use normal stat.minecraft. approach for single worded things
+    #embed handling
+    filenames = []
+    unsortedResults = []
+    for file in os.listdir(statsFolder):
+        if file.endswith('.json'):
+            filenames.append(file)
+    with open('whitelist.json') as WHITELIST_FILE:
+        WHITELIST_FILELoaded = json.load(WHITELIST_FILE)
+        for filename in filenames:
+            with open(statsFolder + '/' + filename) as currentFile:
+                currentFileLoaded = json.load(currentFile)
+                if formattedStat in currentFileLoaded:
+                    currentUUID = filename.replace('.json', '')
+                    currentScore = currentFileLoaded[formattedStat]
+                    for player in WHITELIST_FILELoaded:
+                        if currentUUID in player['uuid']:
+                            currentName = player['name']
+                    unsortedResults.append([currentName, currentScore])
+    for result in unsortedResults:
+        if len(result) != 2:
+            #TODO: make this a message that sends back
+            return discord.Embed(title='Invalid!', type='rich', description='No idea why this broke... try in a few minutes')
+    sortedResults = sorted(unsortedResults, key=lambda x: x[1], reverse=True)
+    if len(sortedResults) > 10 and getAll != 'all':
+        sortedResults = sortedResults[0:10]
+    if len(sortedResults) <= 0:
+        return discord.Embed(title='Invalid!', type='rich', description='Not a stat, or nobody\'s done it')
+    finalResult = ''
+    iterator = 1
+    for result in sortedResults:
+        finalResult = finalResult + '**' + str(iterator) + ': ' + result[0] + '**: ' + str(result[1]) + '\n\n'
+        iterator += 1
+    return discord.Embed(title='Scoreboard for ' + statToGet, type='rich', description=finalResult)
+
+def newPoll(pollOptions):
+    pollResult = ''
+    pollFinal = ''
+
+    # These two checks are to make sure that we don't get a invalid poll request, because that would just be no fun
+    if len(pollOptions) > len(constants.DISCORD_LETTERS):
+        return discord.Embed(title='Failed', type='rich', description='Less than 26 options, please.')
+
+    if len(pollOptions) < 2:
+        return discord.Embed(title='Failed', type='rich', description='Make more options!')
+
+    # Assigns pollResult to the definition of the poll, which is the emoji + the option + a newline
+    i = 0
+    for p in pollOptions:
+        p = constants.DISCORD_LETTERS[i] + ' ' + p + '\n'
+        pollResult = pollResult + p
+        i = i + 1
+
+    # The finished embed object
+    return discord.Embed(title='', type='rich', description=pollResult)
+
+def getPollResult(ctx, pollToResolve):
+    #getting poll contents for later
+    pollTitle = pollToResolve.content
+    pollEmbed = pollToResolve.embeds[0]
+    pollReactions = pollToResolve.reactions
+    #gets poll result
+    pollReactionNumbers = []
+    possibleResolution = True
+    for reaction in pollReactions:
+        pollReactionNumbers.append(reaction.count)
+    pollReactionNumberSet = set()
+    for number in pollReactionNumbers:
+        if number in pollReactionNumberSet and number == max(pollReactionNumberSet):
+            possibleResolution = False
+        else:
+            pollReactionNumberSet.add(number)  
+    if possibleResolution:
+        pollResultIndex = pollReactionNumbers.index(max(pollReactionNumbers))
+        pollResult = str(pollReactions[pollResultIndex].emoji)
+    else:
+        pollResult = 'No decision, it was a tie.'
+    #returns results of all things determined in here
+    return pollTitle, pollEmbed, pollResult
 
 get_mc_playerdata.start()
 mcChatLoop.start()
