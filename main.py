@@ -16,6 +16,7 @@ CHAT_LINK_CHANNEL = 677582149230002176
 POLL_OUTPUT_CHANNEL = 660845995080286208
 
 PLAYER_DATA_FOLDER = 'mcPlayerData'
+LOG_DATA_FOLDER = 'mcLogData'
 
 DIG_GOOD_LIST = ['dig good', 'Dig good', ':dig: good']
 DUPE_BAD_LIST = ['doop bad', 'Doop bad', 'Dupe bad', 'dupe bad', ':doop: bad']
@@ -53,6 +54,13 @@ DISCORD_LETTERS = [
 WHITELIST_FILE = 'whitelist.json'
 DEFENSE_MESSAGE = True
 
+# Lets us know the bot is on!
+@bot.event
+async def on_ready():
+    activity = discord.Activity(name='people, places, things', type=discord.ActivityType.watching)
+    await bot.change_presence(activity=activity)
+    print('Bot connected!')
+
 # Things that can't be done in regular bot.command
 @bot.event
 async def on_message(message):
@@ -82,12 +90,6 @@ async def on_message(message):
     
     await bot.process_commands(message)
 
-# Sets status
-@bot.event
-async def on_ready():
-    activity = discord.Activity(name='people, places, things', type=discord.ActivityType.watching)
-    await bot.change_presence(activity=activity)
-
 #starts a task to get the data for the scoreboards from server
 @tasks.loop(hours=1)
 async def get_mc_playerdata():
@@ -101,7 +103,7 @@ async def mcChatLoop():
     if readLatestLogLine():
         #finds which channel to send results to
         sendChannel = bot.get_channel(CHAT_LINK_CHANNEL)
-        with open('mcLogData/latest.log', 'r') as fp:
+        with open(LOG_DATA_FOLDER + '/latest.log', 'r') as fp:
             data = fp.readlines()
             for line in data:
                 if re.match(r"\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: <\S+>(.+)\n", line):
@@ -231,14 +233,14 @@ def readLatestLogLine():
     global firstTime
     fileChanged = False
     checkLogLen = continuousLogLen
-    currentLogLen = os.path.getsize('mcLogData/latest.log')
+    currentLogLen = os.path.getsize(LOG_DATA_FOLDER + '/latest.log')
     ftp = FTP(host=credentials.FTP_HOST)
     ftp.login(user=credentials.FTP_USER, passwd=credentials.FTP_PASS)
     ftp.cwd('logs')
     ftp.sendcmd('TYPE i')
     ftpFileLen = int(ftp.size('latest.log'))
     if (continuousLogLen < ftpFileLen):
-        with open('mcLogData/latest.log', 'w+') as fp:
+        with open(LOG_DATA_FOLDER + '/latest.log', 'w+') as fp:
             try:
                 ftp.retrbinary('RETR latest.log', lambda data: fp.write(data.decode('UTF-8')), rest=continuousLogLen)
                 fileChanged = True
@@ -368,6 +370,19 @@ def getPollResult(ctx, pollToResolve):
     #returns results of all things determined in here
     return pollTitle, pollEmbed, pollResult
 
+# Ensures that we have all the needed folders/files to start the bot
+
+if not os.path.exists(LOG_DATA_FOLDER):
+    print('Has no logs data folder, creating...')
+    os.mkdir(LOG_DATA_FOLDER)
+    print('Log data folder created.')
+
+if not os.path.exists(PLAYER_DATA_FOLDER):
+    print('Has no player data folder, creating...')
+    os.mkdir(PLAYER_DATA_FOLDER)
+    print('Player data folder created.')
+
+# Starts the bot
 get_mc_playerdata.start()
 mcChatLoop.start()
 bot.run(credentials.BOT_TOKEN)
