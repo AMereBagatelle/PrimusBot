@@ -135,8 +135,7 @@ dmypy.json
 .pytype/
 
 # vscode folder
-.vscode/settings.json
-.vscode/launch.json
+.vscode/
 
 # workspace specific files/folders
 credentials.py
